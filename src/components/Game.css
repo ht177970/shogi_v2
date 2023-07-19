@@ -1,0 +1,82 @@
+.background {
+  background-image: url('https://pic.616pic.com/ys_img/00/09/26/HdlzqX0hmc.jpg');
+  background-size: cover;
+  background-position: left top;
+  width: 100vmin;
+  height: 100vmin;
+  overflow: auto;
+  float: left;
+}
+.content {
+  margin: 2%;
+  width: 96%;
+  height: 96%;
+  border: 0.1vmin solid black;
+}
+.square{
+  width: full;
+  height: full;
+  border: 0.1vmin solid black;
+  position: relative;
+}
+.selected {
+  filter: drop-shadow(0.9vmin 0.9vmin 1vmin #2b2b2b);
+  transform: scale(101%) translate(0, -1vmin);
+}
+
+/* chatgpt */
+.button {
+  display: inline-block;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.button {
+  background-color: #3498db;
+  color: #ffffff;
+}
+
+/* 悬停状态 */
+.button:hover {
+  background-color: #2980b9;
+}
+
+/* 按下状态 */
+.button:active {
+  background-color: #1f618d;
+}
+.piece-moves {
+  width: full;
+  height: 50vh;
+  padding: 20px;
+  background-color: #f0f0f0;
+  overflow: auto;
+  border-radius: 8px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border: 5px solid black;
+}
+
+.move-list {
+  list-style: none;
+  padding: 0;
+}
+
+.movement {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.movement:hover {
+  background-color: #f0f0f0;
+}
