@@ -32,7 +32,19 @@ function initBoard(){
 }
 
 const GameStoreContext = createContext(null);
+const ConfigStoreContext = createContext(null);
 
+export const useConfigStore = () => {
+  const configStore = useContext(ConfigStoreContext);
+  return {
+    mode: configStore.mode,
+    setMode: configStore.setMode,
+    font: configStore.font,
+    setFont: configStore.setFont,
+    notation: configStore.notation,
+    setNotation: configStore.setNotation
+  }
+}
 
 export const useGameStore = () => {
 
@@ -88,7 +100,7 @@ export const useGameStore = () => {
   };
 };
 
-const GameStoreProvider = ({ children }) => {
+const StoreProvider = ({ children }) => {
 
   const viewer = useRef({ facing: 0 });
   const [currentPlayer, setCurrentPlayer] = useState({ facing: 0 });
@@ -102,6 +114,10 @@ const GameStoreProvider = ({ children }) => {
       .map((x) => Array(9).fill(false))
   );
   const selected = useRef(false);
+
+  const [mode, setMode] = useState('normal');
+  const [font, setFont] = useState('feng-bo');
+  const [notation, setNotation] = useState('japanese');
 
   return (
     <GameStoreContext.Provider
@@ -122,9 +138,20 @@ const GameStoreProvider = ({ children }) => {
         selected
       }}
     >
-      {children}
+      <ConfigStoreContext.Provider
+        value={{
+          mode,
+          setMode,
+          font,
+          setFont,
+          notation,
+          setNotation
+        }}
+      >
+        {children}
+      </ConfigStoreContext.Provider>
     </GameStoreContext.Provider>
   );
 };
 
-export default GameStoreProvider;
+export default StoreProvider;

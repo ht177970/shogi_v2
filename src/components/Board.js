@@ -1,23 +1,30 @@
 import { useGameStore } from "../stores/store";
 import Square from "./Square"
 
-function Board({currentBoard, onPlay}){
-  const { selection } = useGameStore();
+function Board({currentBoard, movable, Move, Drop}){
+  const { selection, select, deselect, isSelected } = useGameStore();
 
   function handleClick(pos){
-    /*if(currentBoard[pos.x][pos.y].id === 'None'){
-    return;
-    }*/
-    /*if(selected){
-      if(selected.x !== pos.x || selected.y !== pos.y){
-        Move(selected, pos);
+    if(!movable){
+      return;
+    }
+    if(isSelected()){
+      if(selection.dropPiece){
+        Drop([pos.x, pos.y], selection.dropPiece.id);
       }
-    setSelected(null);
+      else{
+        if(canPromote()){
+          
+        }
+        else{
+          Move([selection.x, selection.y], [pos.x, pos.y], false);
+        }
+      }
+      deselect();
     }
     else{
-    setSelected(pos);
-    }*/
-    onPlay(pos);
+      select(pos.x, pos.y, null);
+    }
   }
   let rows = [];
   for(let i = 0;i < 9;i++){

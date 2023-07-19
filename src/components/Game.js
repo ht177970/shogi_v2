@@ -5,34 +5,15 @@ import useSocket from '../executor/socket';
 import './Game.css'
 import '../index.css';
 import InfoBar from './InfoBar';
+import Dashboard from './Dashboard';
 
 function Game(){
-  const { history, currentMove, setCurrentMove, selection, select, deselect, isSelected } = useGameStore();
-  const { Move, Drop, Setup } = useSocket();
+  const { history, currentMove, setCurrentMove } = useGameStore();
+  const { Setup, Move, Drop } = useSocket();
   const scroller = useRef(null);
   const board = useRef(null);
   const currentBoard = history[currentMove];
-
-  function handleClick(pos){
-    if(currentMove !== history.length - 1){
-      return;
-    }
-    if(isSelected()){
-      if(selection.dropPiece){
-        Drop([pos.x, pos.y], selection.dropPiece.id);
-      }
-      else{
-        Move([selection.x, selection.y], [pos.x, pos.y], false);
-      }
-      deselect();
-    }
-    else{
-      select(pos.x, pos.y, null);
-    }
-    //Move([from.x, from.y], [to.x, to.y], false);
-    //setHistory([...history.slice(0, currentMove + 1), nextBoard])
-    //setCurrentMove(currentMove + 1)
-  }
+  const movable = (currentMove === history.length - 1);
 
   function jumpTo(move){
     setCurrentMove(move);
@@ -88,7 +69,7 @@ function Game(){
   return(
     <>
       <div className='background' ref={board}>
-        <Board currentBoard={currentBoard} onPlay={handleClick}/>
+        <Board currentBoard={currentBoard} movable={movable} Move={Move} Drop={Drop}/>
       </div>
       <div className='piece-moves' ref={scroller}>
         <ul className='move-list'>
@@ -96,7 +77,10 @@ function Game(){
         </ul>
       </div>
       <div className='button' onClick={() => setup()}>連接至Server</div>
-      {infos}
+      <div>
+        {infos}
+      </div>
+      <Dashboard/>
     </>
   );
 }

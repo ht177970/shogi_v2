@@ -1,3 +1,5 @@
+import { useConfigStore } from "../stores/store"
+
 const size = {
   'p': 0.8,
   's': 0.9,
@@ -18,9 +20,10 @@ const getAssetURL = (path) => {
   //return new URL(`http://localhost:8080/assets/appearance/piece/${path}`, import.meta.url).href
 }
 
-const getMask = (piece) => {
+const GetMask = (piece) => {
+  const { font } = useConfigStore();
   const name = piece.id + (piece.promoted ? '1' : '0');
-  const url = getAssetURL(`text/hai-yan/${name}.svg`)
+  const url = getAssetURL(`text/${font}/${name}.svg`)
   return `url(${url}) no-repeat center / contain`
 }
 
@@ -32,7 +35,7 @@ function Piece({selected, piece}){
         style={{
           height: size[piece.id] * 70 + "%",
           backgroundColor: piece.promoted ? '#ff0000' : '#000000',
-          mask: getMask(piece), WebkitMask: getMask(piece)
+          mask: GetMask(piece), WebkitMask: GetMask(piece)
         }}/>
         <img alt='' draggable={false} className='absolute w-full h-full' src={getAssetURL('body/' + imagePath[piece.facing])}/>
       </div>
