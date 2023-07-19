@@ -6,10 +6,14 @@ function Square({selected, piece, onSquareClick}){
     text = <Piece selected={selected} piece={piece}/>
   }
   return(
-    <div className='square' onClick={onSquareClick}>
-      <div className='absolute w-full h-full bg-opacity-[0.1]' style={{backgroundColor: (selected ? '#ffffff4D' : '')}}>
+    <div className='relative' onClick={onSquareClick}>
+      <div className='relative select-none w-full h-full'>
+        <div className='absolute w-full h-full border-[0.1vmin] bg-opacity-[0.1]' style={{borderColor:'#000000', backgroundColor: (selected ? '#ffffff4D' : '')}}>
+        </div>
+        <div className='absolute w-full h-full z-10' style={{transform: 'rotate(' + 90 * piece.facing + 'deg)'}}>
+        {text}
+        </div>
       </div>
-      {text}
     </div>
   )
 }
