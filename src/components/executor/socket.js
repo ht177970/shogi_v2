@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 import { rotate } from '../entity/utils';
-import { useGameStore } from '../stores/store'
+import { initBoard, useGameStore } from '../stores/store';
 import { useRef } from 'react';
 
 const apiURL = 'https://yonin-shogi-r.ht177970.repl.co/game';
@@ -71,10 +71,16 @@ const useSocket = () => {
     socketRef.current = io(apiURL);
     setupRef.current = () => {
       setCurrentMove(0);
-      setHistory((prevHistory) => [prevHistory[0]]);
+      setHistory([initBoard()]);
       socketRef.current.on('update', (res) => {
         // 注意这里使用函数形式来更新 history，以保证正确的顺序和更新
-        setHistory((prevHistory) => [...prevHistory, convertToBoard(res[0], viewer.current.facing)]);
+        setHistory((prevHistory) => {
+          const nextBoard = convertToBoard(res[0], viewer.current.facing);
+          if(prevHistory.length === 1 && prevHistory[0][8][4].id == 'None'){
+            return [nextBoard];
+          }
+          return [...prevHistory, nextBoard];
+        });
         setPlayers(convertToPlayers(res[1], viewer.current.facing));
         setCurrentPlayer({facing: (res[2] - viewer.current.facing + 4) % 4});
       });

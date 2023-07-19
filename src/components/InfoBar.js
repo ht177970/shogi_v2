@@ -1,4 +1,4 @@
-import { useGameStore } from "../stores/store";
+import { useGameStore } from "./stores/store";
 import PieceStand from "./PieceStand";
 
 function InfoBar({facing}){

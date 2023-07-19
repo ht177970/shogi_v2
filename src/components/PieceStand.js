@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useGameStore } from "../stores/store";
+import { useGameStore } from "./stores/store";
 import Piece from "./Piece";
 
 function PieceStand({facing}){

@@ -1,7 +1,6 @@
-import { rotate } from '../entity/utils';
 import { createContext, useContext, useRef, useState } from 'react';
 
-function initBoard(){
+export function initBoard(){
   const board = Array(9);
   for(let i = 0;i < 9;i++){
     board[i] = Array(9)

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Board from './Board';
-import { useGameStore } from '../stores/store';
-import useSocket from '../executor/socket';
+import { initBoard, useGameStore } from './stores/store';
+import useSocket from './executor/socket';
 import './Game.css'
 import '../index.css';
 import InfoBar from './InfoBar';
@@ -12,7 +12,10 @@ function Game(){
   const { Setup, Move, Drop } = useSocket();
   const scroller = useRef(null);
   const board = useRef(null);
-  const currentBoard = history[currentMove];
+  let currentBoard = history[currentMove];
+  if(!currentBoard){
+    currentBoard = initBoard();
+  }
   const movable = (currentMove === history.length - 1);
 
   function jumpTo(move){
@@ -34,11 +37,13 @@ function Game(){
         if(currentMove + 1 < history.length){
           setCurrentMove(currentMove + 1);
         }
+        else{
+          setCurrentMove(history.length - 1);
+        }
       }
-      return false;
     }
     board.current?.addEventListener('wheel', onWheel, {passive: false});
-  }, [currentMove, history.length, setCurrentMove]);
+  }, [currentMove, history, setCurrentMove]);
 
   useEffect(() => {
     if(currentMove === history.length - 2){
@@ -69,7 +74,7 @@ function Game(){
   return(
     <>
       <div className='background' ref={board}>
-        <Board currentBoard={currentBoard} movable={movable} Move={Move} Drop={Drop}/>
+        <Board currentBoard={currentBoard} movable={movable} move={Move} drop={Drop}/>
       </div>
       <div className='piece-moves' ref={scroller}>
         <ul className='move-list'>

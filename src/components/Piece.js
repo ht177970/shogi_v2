@@ -1,4 +1,4 @@
-import { useConfigStore } from "../stores/store"
+import { useConfigStore } from "./stores/store"
 
 const size = {
   'p': 0.8,
@@ -27,9 +27,9 @@ const GetMask = (piece) => {
   return `url(${url}) no-repeat center / contain`
 }
 
-function Piece({selected, piece}){
+function Piece({selected, piece, onClick}){
   return(
-    <div className={'transition-all h-full' + (selected ? ' selected' : '')}>
+    <div className={'transition-all h-full' + (selected ? ' selected' : '')} onClick={() => {onClick();}}>
       <div className='aspect-square relative w-full h-full flex select-none' style={{transform: 'scale(' + size[piece.id] + ')'}}>
         <div className='max-w-[50%] h-[70%] z-10 m-auto aspect-[3/4]'
         style={{

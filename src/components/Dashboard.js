@@ -1,7 +1,7 @@
 import './Dashboard.css'
 
 import React from 'react';
-import { useConfigStore } from '../stores/store';
+import { useConfigStore } from './stores/store';
 
 function Dashboard(){
   const { mode, font, notation, setMode, setFont, setNotation } = useConfigStore();
