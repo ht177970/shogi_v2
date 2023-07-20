@@ -7,9 +7,9 @@ import '../index.css';
 import InfoBar from './InfoBar';
 import Dashboard from './Dashboard';
 
-function Game(){
-  const { history, currentMove, setCurrentMove } = useGameStore();
-  const { Setup, Move, Drop } = useSocket();
+function Game({roomId, nickname}){
+  const { history, currentMove, setCurrentMove, deselect } = useGameStore();
+  const { Setup, Move, Drop } = useSocket(roomId, nickname);
   const scroller = useRef(null);
   const board = useRef(null);
   let currentBoard = history[currentMove];
@@ -18,12 +18,11 @@ function Game(){
   }
   const movable = (currentMove === history.length - 1);
 
-  function jumpTo(move){
-    setCurrentMove(move);
-  }
+  useEffect(() => Setup(), []);
 
-  function setup(){
-    Setup();
+  function jumpTo(move){
+    deselect();
+    setCurrentMove(move);
   }
 
   useEffect(() =>{
@@ -31,19 +30,22 @@ function Game(){
       event.preventDefault();
       if (event.wheelDelta > 0) {
         if(currentMove - 1 >= 0){
+          deselect();
           setCurrentMove(currentMove - 1);
         }
       } else {
         if(currentMove + 1 < history.length){
+          deselect();
           setCurrentMove(currentMove + 1);
         }
         else{
+          deselect();
           setCurrentMove(history.length - 1);
         }
       }
     }
     board.current?.addEventListener('wheel', onWheel, {passive: false});
-  }, [currentMove, history, setCurrentMove]);
+  }, [currentMove, history, setCurrentMove, deselect]);
 
   useEffect(() => {
     if(currentMove === history.length - 2){
@@ -81,7 +83,7 @@ function Game(){
           {moves}
         </ul>
       </div>
-      <div className='button' onClick={() => setup()}>連接至Server</div>
+
       <div>
         {infos}
       </div>
@@ -89,5 +91,5 @@ function Game(){
     </>
   );
 }
-
+//<div className='button' onClick={() => setup()}>連接至Server</div>
 export default Game;

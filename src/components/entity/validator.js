@@ -10,14 +10,13 @@ function getReachablePoints(board, point) {
     const piece = board[x][y];
     const MOVEMENTS = {
         '-1': [],
-        0: [[-1, 0]],
-        1: [ [-1, -1], [-1, 0], [-1, 1], [1, -1], [1, 1] ],
-        2: [ [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, 0] ],
-        3: [],
-        4: [ [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1] ],
-        5: [ [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, 0] ],
-        6: [ [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, 0] ],
-        7: [ [-1, -1], [-1, 1], [1, -1], [1, 1] ]
+        'None': [],
+        'p': [[-1, 0]],
+        's': [ [-1, -1], [-1, 0], [-1, 1], [1, -1], [1, 1] ],
+        'g': [ [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, 0] ],
+        'r': [],
+        'k': [ [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1] ],
+        'R': [ [-1, -1], [-1, 1], [1, -1], [1, 1] ]
         // 'n':[[-2,-1],[-2,1]],
         // 'l':[[-1,0]],
         // 'b':[[-1,-1],[-1,1],[1,-1],[1,1]],
@@ -27,7 +26,8 @@ function getReachablePoints(board, point) {
     const addReachablePoint = (x, y) => {
         if (board[x][y].facing !== piece.facing) reachablePoints.push([x, y]);
     };
-    for (const [moveX, moveY] of MOVEMENTS[piece.type]) {
+    const piece_id = !piece.promoted ? piece.id : piece.id === 'r' ? 'R' : 'g';
+    for (const [moveX, moveY] of MOVEMENTS[piece_id]) {
         const [newX, newY] = rotate(
             [x + moveX, y + moveY],
             [x, y],
@@ -36,10 +36,10 @@ function getReachablePoints(board, point) {
         if (isOnBoard(newX, newY)) addReachablePoint(newX, newY);
     }
 
-    if ([3, 7].includes(piece.type)) {
+    if (piece.id === 'r') {
         for (let n = 0; n < 4; ++n) {
             applyOnLine([x, y], rotate([0, -1], [0, 0], n), (x, y) => {
-                if (board[x][y].type !== -1) {
+                if (board[x][y].id !== 'None') {
                     addReachablePoint(x, y);
                     return true;
                 }
@@ -63,7 +63,7 @@ function isThreatened(board, players, point) {
             isOnBoard(x + dx, y + dy) &&
             isThreatening(players, board[x+dx][y+dy], piece) &&
             includePoint(getReachablePoints(board, [x + dx, y + dy]), [x, y])
-        )
+            )
             return true;
 
     let result = false;
@@ -72,8 +72,8 @@ function isThreatened(board, players, point) {
             const threateningPiece = board[x][y];
             result |=
                 isThreatening(players, threateningPiece, piece) &&
-                [3, 7].includes(threateningPiece.type);
-            if (threateningPiece.type !== -1) return true;
+                threateningPiece.id === 'r';
+            if (threateningPiece.id !== 'None') return true;
         });
     }
 
@@ -84,7 +84,7 @@ function getPointKing(board, facing) {
     let pointKing = [];
     for (const [x, row] of board.entries())
         for (const [y, piece] of row.entries())
-            if (piece.type === 4 && piece.facing === facing)
+            if (piece.id === 'k' && piece.facing === facing)
                 pointKing = [x, y];
     return pointKing;
 }
@@ -106,9 +106,9 @@ function getValidPoints(board, players, facing, point) {
     let [kingX, kingY] = getPointKing(board, facing);
     const reachablePoints = getReachablePoints(board, [x, y]);
     const validPoints = reachablePoints.filter(([toX, toY]) => {
-        if (board[toX][toY].type === 4) return false;
+        if (board[toX][toY].id === 'k') return false;
         const newBoard = board.map((row) => row.slice());
-        if (piece.type === 4) {
+        if (piece.id === 'k') {
             kingX = toX;
             kingY = toY;
         }
@@ -127,7 +127,7 @@ function getColumnsWithPawn(board, facing) {
             rotate([1, 0], [0, 0], facing),
             (x, y) => {
                 const piece = board[x][y];
-                if (piece.type === 0 && piece.facing === facing) {
+                if (piece.id === 'p' && piece.facing === facing) {
                     columnsWithPawn.push(facing % 2 ? x : y);
                     return true;
                 }
@@ -140,7 +140,7 @@ function isDropPawnMate(board, players, facing, point) {
     const [x, y] = sumOfPoints(point, rotate([-1, 0], [0, 0], facing));
     if (!isOnBoard(x, y)) return false;
     const piece = board[x][y];
-    if (piece.type === 4 && piece.facing !== facing) {
+    if (piece.id === 4 && piece.facing !== facing) {
         const [x, y] = point;
         const newBoard = board.map((row) => row.slice());
         newBoard[x][y] = {id: 'p', facing: facing, promoted: false};
@@ -154,14 +154,14 @@ function getDroppablePoints(board, players, facing, dropPiece) {
     const pointKing = getPointKing(board, facing);
     for (const [x, row] of board.entries())
         for (const [y, piece] of row.entries())
-            if (piece.type === -1) {
+            if (piece.id === 'None') {
                 const newBoard = board.map((row) => row.slice());
                 newBoard[x][y] = dropPiece;
                 if (!isThreatened(newBoard, players, pointKing))
                     droppablePoints.push([x, y]);
             }
 
-    if (dropPiece.type === 0) {
+    if (dropPiece.id === 'p') {
         const columnsWithPawn = getColumnsWithPawn(board, facing);
         droppablePoints = droppablePoints.filter((point) => {
             const [rx, ry] = rotate(point, [4, 4], -facing);

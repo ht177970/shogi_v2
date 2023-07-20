@@ -1,4 +1,5 @@
 import { createContext, useContext, useRef, useState } from 'react';
+import { getValidities } from '../validator';
 
 export function initBoard(){
   const board = Array(9);
@@ -8,25 +9,6 @@ export function initBoard(){
     board[i][j] = {id: 'None', facing: -1, promoted: false};
     }
   }
-  //init board
-  /*[
-    [[6, 4], 'p'],
-    [[7, 3], 'p'],
-    [[7, 4], 'r'],
-    [[7, 5], 'p'],
-    [[8, 2], 's'],
-    [[8, 3], 'g'],
-    [[8, 4], 'k'],
-    [[8, 5], 'g'],
-    [[8, 6], 's']
-  ].forEach((args) => {
-    for (let n = 0; n < 4; ++n) {
-      const [rotatedX, rotatedY] = rotate(args[0], [4, 4], n);
-      board[rotatedX][rotatedY].id = args[1]
-      board[rotatedX][rotatedY].facing = n
-    }
-  });*/
-
   return board
 }
 
@@ -60,18 +42,17 @@ export const useGameStore = () => {
   function select(x, y, dropPiece = null) {
     gameStore.setSelection({x: x, y: y, dropPiece: dropPiece});
     gameStore.selected.current = true;
-    //Object.assign(hint, getValidities());
+    gameStore.setHint(getValidities(
+      gameStore.history[gameStore.currentMove],
+      gameStore.players,
+      gameStore.currentPlayer,
+      {x: x, y: y, dropPiece: dropPiece}));
   }
 
   function deselect() {
     gameStore.setSelection({x: -1, y: -1, dropPiece: null});
     gameStore.selected.current = false;
-    /*Object.assign(
-      gameStore.hint,
-      Array(9)
-        .fill(0)
-        .map((x) => Array(9).fill(false))
-    );*/
+    gameStore.setHint(Array(9).fill(0).map((x) => Array(9).fill(false)));
   }
 
   function isSelected() {
@@ -95,7 +76,8 @@ export const useGameStore = () => {
     setPlayers: gameStore.setPlayers,
     setCurrentPlayer: gameStore.setCurrentPlayer,
     setSelection: gameStore.setSelection,
-    setHint: gameStore.setHint
+    setHint: gameStore.setHint,
+    isPlayer: gameStore.isPlayer
   };
 };
 
@@ -105,17 +87,18 @@ const StoreProvider = ({ children }) => {
   const [currentPlayer, setCurrentPlayer] = useState({ facing: 0 });
   const [history, setHistory] = useState([initBoard()]);
   const [currentMove, setCurrentMove] = useState(0);
-  const [players, setPlayers] = useState(Array(4).fill().map((v, i) => { return {facing: i, pieceInHand: {'p': 0, 's': 0, 'g': 0, 'r': 0}, checkmated: false}}));
+  const [players, setPlayers] = useState(Array(4).fill().map((v, i) => { return {facing: i, piecesInHand: {'p': 0, 's': 0, 'g': 0, 'r': 0}, checkmated: false}}));
   const [selection, setSelection] = useState({ x: -1, y: -1, dropPiece: null });
   const [hint, setHint] = useState(
     Array(9)
       .fill(0)
       .map((x) => Array(9).fill(false))
   );
+  const isPlayer = useRef(true);
   const selected = useRef(false);
 
   const [mode, setMode] = useState('normal');
-  const [font, setFont] = useState('feng-bo');
+  const [font, setFont] = useState('hai-yan');
   const [notation, setNotation] = useState('japanese');
 
   return (
@@ -134,7 +117,8 @@ const StoreProvider = ({ children }) => {
         setSelection,
         hint,
         setHint,
-        selected
+        selected,
+        isPlayer
       }}
     >
       <ConfigStoreContext.Provider
