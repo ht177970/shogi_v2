@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const apiURL = 'https://yonin-shogi-r.ht177970.repl.co/game';
+const apiURL = 'http://ryanmsg.myftp.biz:8080/game';
 
 function RoomList({setUrl, username, setUsername}){
   const [socket, setSocket] = useState(null);

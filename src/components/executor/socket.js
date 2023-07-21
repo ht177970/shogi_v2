@@ -3,7 +3,7 @@ import { rotate } from '../entity/utils';
 import { initBoard, useGameStore } from '../stores/store';
 import { useRef } from 'react';
 
-const apiURL_prefix = 'https://yonin-shogi-r.ht177970.repl.co/';
+const apiURL_prefix = 'http://ryanmsg.myftp.biz:8080/';
 
 function convertToPiece(pieceData, rotation) {
   const { id, facing, promoted } = pieceData;

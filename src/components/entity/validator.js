@@ -60,10 +60,10 @@ function isThreatened(board, players, point) {
     const piece = board[x][y];
     for (const [dx, dy] of [ [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1] ])
         if (
-            isOnBoard(x + dx, y + dy) &&
-            isThreatening(players, board[x+dx][y+dy], piece) &&
-            includePoint(getReachablePoints(board, [x + dx, y + dy]), [x, y])
-            )
+        isOnBoard(x + dx, y + dy) &&
+        isThreatening(players, board[x+dx][y+dy], piece) &&
+        includePoint(getReachablePoints(board, [x + dx, y + dy]), [x, y])
+        )
             return true;
 
     let result = false;
@@ -93,8 +93,8 @@ function isCheckmated(board, players, facing) {
     for (const [x, row] of board.entries())
         for (const [y, piece] of row.entries())
             if (
-                piece.facing === facing &&
-                getValidPoints(board, players, facing, [x, y]).length
+            piece.facing === facing &&
+            getValidPoints(board, players, facing, [x, y]).length
             )
                 return false;
     return true;
