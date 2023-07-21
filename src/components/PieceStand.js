@@ -30,7 +30,7 @@ function PieceStand({facing}){
     )
   }
   return(
-    <div className="w-fit bg-red-400 flex flex-row">
+    <div className="min-w-[20%] bg-red-400 flex flex-row">
       {content}
     </div>
   )
