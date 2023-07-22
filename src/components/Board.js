@@ -32,10 +32,10 @@ function Hint({onHintClick}){
 
 function Board({currentBoard, movable, move, drop}){
   const [ promotionDialog, setPromotionDialog ] = useState({x: -1, y: -1, facing: -1, id: 'None'});
-  const { selection, select, deselect, isSelected, currentPlayer, hint } = useGameStore();
+  const { selection, select, deselect, isSelected, currentPlayer, hint, isPlayer } = useGameStore();
 
   function handleClick(pos){
-    if(!movable){
+    if(!movable || !isPlayer.current){
       return;
     }
     if (!isSelected() && canSelect(currentBoard[pos.x][pos.y], currentPlayer))

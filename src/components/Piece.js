@@ -17,7 +17,6 @@ const imagePath = [
 
 const getAssetURL = (path) => {
   return new URL(`https://ht177970.github.io/shogi_v1/assets/appearance/piece/${path}`, import.meta.url).href
-  //return new URL(`http://localhost:8080/assets/appearance/piece/${path}`, import.meta.url).href
 }
 
 const GetMask = (piece) => {
