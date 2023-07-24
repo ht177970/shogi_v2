@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/shogi_v1/static/css/main.6968cba1.css",
-    "main.js": "/shogi_v1/static/js/main.0cbaf06c.js",
-    "static/js/787.0f361b79.chunk.js": "/shogi_v1/static/js/787.0f361b79.chunk.js",
-    "index.html": "/shogi_v1/index.html",
-    "main.6968cba1.css.map": "/shogi_v1/static/css/main.6968cba1.css.map",
-    "main.0cbaf06c.js.map": "/shogi_v1/static/js/main.0cbaf06c.js.map",
-    "787.0f361b79.chunk.js.map": "/shogi_v1/static/js/787.0f361b79.chunk.js.map"
+    "main.css": "/shogi_v2/static/css/main.6968cba1.css",
+    "main.js": "/shogi_v2/static/js/main.ae403adc.js",
+    "static/js/787.cda3e273.chunk.js": "/shogi_v2/static/js/787.cda3e273.chunk.js",
+    "index.html": "/shogi_v2/index.html",
+    "main.6968cba1.css.map": "/shogi_v2/static/css/main.6968cba1.css.map",
+    "main.ae403adc.js.map": "/shogi_v2/static/js/main.ae403adc.js.map",
+    "787.cda3e273.chunk.js.map": "/shogi_v2/static/js/787.cda3e273.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.6968cba1.css",
-    "static/js/main.0cbaf06c.js"
+    "static/js/main.ae403adc.js"
   ]
 }
