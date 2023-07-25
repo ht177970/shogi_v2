@@ -73,7 +73,7 @@ function Board({currentBoard, movable, move, drop}){
   function handleHintClick(x, y){
     setPromotionDialog({x: -1, y: -1, facing: -1, id: 'None'});
     if (selection.dropPiece)
-        drop([x, y], selection.dropPiece.type);
+        drop([x, y], selection.dropPiece.id);
     else if (canPromote([x, y], currentBoard, selection)) {
         setPromotionDialog({x: x, y: y, facing: currentBoard[selection.x][selection.y].facing, id: currentBoard[selection.x][selection.y].id});
         return

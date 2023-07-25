@@ -3,7 +3,7 @@ import { rotate } from '../entity/utils';
 import { initBoard, useGameStore } from '../stores/store';
 import { useRef } from 'react';
 
-const apiURL_prefix = 'http://ryanmsg.myftp.biz:8080/';
+const apiURL_prefix = 'https://ryanmsg.myftp.biz:8080/';
 
 function convertToPiece(pieceData, rotation) {
   const { id, facing, promoted } = pieceData;
@@ -53,8 +53,20 @@ function convertToBoard(arr, rotation) {
   return board;
 }
 
+function isSameBoard(prevBoard, nextBoard){
+  const length = 9;
+  for(let i = 0;i < length;i++){
+    for(let j = 0;j < length;j++){
+      if(prevBoard[i][j] !== nextBoard[i][j]){
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 const getSoundURL = (path) => {
-  return new URL(`https://ht177970.github.io/shogi_v1/assets/sound/${path}Sound.mp3`, import.meta.url).href
+  return new URL(`https://ht177970.github.io/shogi_v2/assets/sound/${path}Sound.mp3`, import.meta.url).href
 }
 
 
@@ -73,6 +85,9 @@ const useSocket = (roomId, nickname, setAudio) => {
     setAudio(new Audio(getSoundURL(res[3])));
     setHistory((prevHistory) => {
       const nextBoard = convertToBoard(res[0], viewer.current.facing);
+      if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
+        return [...prevHistory];
+      }
       if(prevHistory.length === 1 && prevHistory[0][8][4].id === 'None'){
         return [nextBoard];
       }
@@ -114,14 +129,14 @@ const useSocket = (roomId, nickname, setAudio) => {
     socketRef.current.emit('move', [
       rotate(origin, [4, 4], viewer.current.facing),
       rotate(destination, [4, 4], viewer.current.facing),
-      promotion,
+      promotion
     ]);
   }
 
   function drop(destination, pieceID) {
     socketRef.current.emit('drop', [
       rotate(destination, [4, 4], viewer.current.facing),
-      pieceID,
+      pieceID
     ]);
   }
 
@@ -136,6 +151,7 @@ const useSocket = (roomId, nickname, setAudio) => {
       socketRef.current.on('roomUpdate', onRoomUpdate);
       socketRef.current.on('tokenUpdate', onTokenUpdate);
       socketRef.current.emit('rejoin', [nickname, token.current]);
+      console.log(token.current);
     }
   }
 
