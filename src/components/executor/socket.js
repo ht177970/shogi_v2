@@ -141,7 +141,7 @@ const useSocket = (roomId, nickname, setAudio) => {
   }
 
   function reconnect(){
-    if(!gameStarted.current){
+    if(!gameStarted.current || !isPlayer.current){
       initializeSocket();
     }
     else{
