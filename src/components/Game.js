@@ -29,7 +29,6 @@ function Game({roomId, nickname}){
         disconnect();
       }
       appState.current = nextAppState;
-      console.log("AppState", appState.current);
   }
 
   useEffect (() => {

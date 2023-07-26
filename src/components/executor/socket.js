@@ -57,7 +57,7 @@ function isSameBoard(prevBoard, nextBoard){
   const length = 9;
   for(let i = 0;i < length;i++){
     for(let j = 0;j < length;j++){
-      if(prevBoard[i][j] !== nextBoard[i][j]){
+      if((prevBoard[i][j] && nextBoard[i][j]) && (prevBoard[i][j].id !== nextBoard[i][j].id || prevBoard[i][j].facing !== nextBoard[i][j].facing || prevBoard[i][j].promoted !== nextBoard[i][j].promoted)){
         return false;
       }
     }
@@ -104,6 +104,7 @@ const useSocket = (roomId, nickname, setAudio) => {
   function onFirstUpdate(res){
     viewer.current.facing = res[0];
     isPlayer.current = res[1];
+    console.log(isPlayer);
   }
 
   function onTokenUpdate(res){
@@ -141,7 +142,7 @@ const useSocket = (roomId, nickname, setAudio) => {
   }
 
   function reconnect(){
-    if(!gameStarted.current || !isPlayer.current){
+    if(!gameStarted.current){
       initializeSocket();
     }
     else{
@@ -151,7 +152,6 @@ const useSocket = (roomId, nickname, setAudio) => {
       socketRef.current.on('roomUpdate', onRoomUpdate);
       socketRef.current.on('tokenUpdate', onTokenUpdate);
       socketRef.current.emit('rejoin', [nickname, token.current]);
-      console.log(token.current);
     }
   }
 
