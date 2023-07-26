@@ -1,6 +1,5 @@
 import './Dashboard.css'
 
-import React from 'react';
 import { useConfigStore } from './stores/store';
 
 function Dashboard(){
