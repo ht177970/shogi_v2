@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/shogi_v2/static/css/main.cf2bff29.css",
-    "main.js": "/shogi_v2/static/js/main.2191e3ec.js",
+    "main.js": "/shogi_v2/static/js/main.b93de211.js",
     "static/js/787.cda3e273.chunk.js": "/shogi_v2/static/js/787.cda3e273.chunk.js",
     "index.html": "/shogi_v2/index.html",
     "main.cf2bff29.css.map": "/shogi_v2/static/css/main.cf2bff29.css.map",
-    "main.2191e3ec.js.map": "/shogi_v2/static/js/main.2191e3ec.js.map",
+    "main.b93de211.js.map": "/shogi_v2/static/js/main.b93de211.js.map",
     "787.cda3e273.chunk.js.map": "/shogi_v2/static/js/787.cda3e273.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.cf2bff29.css",
-    "static/js/main.2191e3ec.js"
+    "static/js/main.b93de211.js"
   ]
 }
