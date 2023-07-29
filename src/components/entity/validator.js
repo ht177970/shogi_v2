@@ -140,7 +140,7 @@ function isDropPawnMate(board, players, facing, point) {
     const [x, y] = sumOfPoints(point, rotate([-1, 0], [0, 0], facing));
     if (!isOnBoard(x, y)) return false;
     const piece = board[x][y];
-    if (piece.id === 4 && piece.facing !== facing) {
+    if (piece.id === 'p' && piece.facing !== facing) {
         const [x, y] = point;
         const newBoard = board.map((row) => row.slice());
         newBoard[x][y] = {id: 'p', facing: facing, promoted: false};
