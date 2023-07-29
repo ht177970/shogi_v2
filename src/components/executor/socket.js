@@ -75,7 +75,6 @@ const useSocket = (roomId, nickname, setAudio) => {
 
   // 使用 useRef 保持 socket 和 Setup 的持久性
   const socketRef = useRef(null);
-  const setupRef = useRef(null);
   const gameStarted = useRef(false);
   const token = useRef('');
 
@@ -95,6 +94,7 @@ const useSocket = (roomId, nickname, setAudio) => {
     });
     setPlayers(convertToPlayers(res[1], viewer.current.facing));
     setCurrentPlayer({facing: (res[2] - viewer.current.facing + 4) % 4});
+    new Audio(getSoundURL('YourTurn'))?.play();
   }
 
   function onRoomUpdate(res){
@@ -114,16 +114,13 @@ const useSocket = (roomId, nickname, setAudio) => {
   // 初始化 socket 和监听事件的 Setup 函数
   function initializeSocket() {
     socketRef.current = io(apiURL_prefix + roomId);
-    setupRef.current = () => {
-      setCurrentMove(0);
-      setHistory([initBoard()]);
-      socketRef.current.on('update', onUpdate);
-      socketRef.current.on('firstUpdate', onFirstUpdate);
-      socketRef.current.on('roomUpdate', onRoomUpdate);
-      socketRef.current.on('tokenUpdate', onTokenUpdate);
-      socketRef.current.emit('join', [nickname]);
-    };
-    setupRef.current(); // 调用 Setup 函数开始监听
+    setCurrentMove(0);
+    setHistory([initBoard()]);
+    socketRef.current.on('update', onUpdate);
+    socketRef.current.on('firstUpdate', onFirstUpdate);
+    socketRef.current.on('roomUpdate', onRoomUpdate);
+    socketRef.current.on('tokenUpdate', onTokenUpdate);
+    socketRef.current.emit('join', [nickname]);
   }
 
   function move(origin, destination, promotion) {
@@ -142,7 +139,7 @@ const useSocket = (roomId, nickname, setAudio) => {
   }
 
   function reconnect(){
-    if(!gameStarted.current){
+    if(!gameStarted.current && !isPlayer.current){
       initializeSocket();
     }
     else{
