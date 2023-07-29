@@ -8,10 +8,10 @@ import '../index.css';
 import InfoBar from './InfoBar';
 import Dashboard from './Dashboard';
 
-function Game({roomId, nickname}){
+function Game({roomId, nickname, setUrl}){
   const [audio, setAudio] = useState(null);
-  const { history, currentMove, setCurrentMove, deselect } = useGameStore();
-  const { setup, move, drop, reconnect, disconnect } = useSocket(roomId, nickname, setAudio);
+  const { history, currentMove, setCurrentMove, isPlayer, deselect } = useGameStore();
+  const { gameStarted, setup, move, drop, reconnect, disconnect, inactive } = useSocket(roomId, nickname, setAudio);
   const scroller = useRef(null);
   const board = useRef(null);
   let currentBoard = history[currentMove];
@@ -24,30 +24,30 @@ function Game({roomId, nickname}){
 
   const _handleAppStateChange = (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === "active") {
-
-      }else{
         disconnect();
         reconnect();
+      }else{
+        inactive();
       }
       appState.current = nextAppState;
   }
-
-  useEffect (() => {
-    AppState.addEventListener("change", _handleAppStateChange);
-
-    return () => {
-      AppState.removeEventListener("change", _handleAppStateChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    setup();
-  }, []);
 
   function jumpTo(move){
     deselect();
     setCurrentMove(move);
   }
+
+  function leave(){
+    if(!gameStarted.current || !isPlayer.current){
+      disconnect();
+      setUrl(null);
+    }
+  }
+
+  useEffect(() => {
+    setup();
+    AppState.addEventListener("change", _handleAppStateChange);
+  }, []);
 
   useEffect(() =>{
     function onWheel(event){
@@ -81,22 +81,20 @@ function Game({roomId, nickname}){
 
   const moves = history.map((board, move) => {
     return(
-      <li className='movement' onClick={() => jumpTo(move)}
+      <li className='movement' onClick={() => {jumpTo(move);}}
       style={{backgroundColor: move === currentMove && 'aqua'}} key={move}>
         {"第" + move + "手"}
       </li>
     )
   });
 
-  const infos = []
+  const infos = [];
   for(let i = 0;i < 4;i++){
     infos.push(
       <InfoBar key={i} facing={i}/>
     )
   }
 
-  //test for board first
-  //it should be lobby at done
   return(
     <>
       <div className='background' ref={board}>
@@ -111,8 +109,8 @@ function Game({roomId, nickname}){
         {infos}
       </div>
       <Dashboard/>
+      <div className='button' onClick={() => {leave();}}>離開房間</div>
     </>
   );
 }
-//<div className='button' onClick={() => setup()}>連接至Server</div>
 export default Game;
