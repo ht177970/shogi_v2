@@ -153,7 +153,12 @@ const useSocket = (roomId, nickname, setAudio) => {
     socketRef.current.disconnect();
   }
 
-  return { gameStarted, socket: socketRef.current, setup: initializeSocket, move, drop, reconnect, disconnect, inactive };
+  function leaveRoom(){
+    socketRef.current.emit('leave');
+    disconnect();
+  }
+
+  return { gameStarted, socket: socketRef.current, setup: initializeSocket, move, drop, reconnect, disconnect, inactive, leaveRoom };
 };
 
 export default useSocket;
