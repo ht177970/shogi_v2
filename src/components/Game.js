@@ -24,9 +24,10 @@ function Game({roomId, nickname}){
 
   const _handleAppStateChange = (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === "active") {
-        reconnect();
+
       }else{
         disconnect();
+        reconnect();
       }
       appState.current = nextAppState;
   }
