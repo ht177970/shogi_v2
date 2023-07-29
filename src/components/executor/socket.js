@@ -30,7 +30,7 @@ function convertToPlayers(playersData, rotation) {
 }
 
 function convertToBoard(arr, rotation) {
-  const length = 9; // Math.sqrt(arr.length)
+  const length = 9;
   const board = [];
 
   for (let i = 0; i < length; i++) {
@@ -73,19 +73,20 @@ const getSoundURL = (path) => {
 const useSocket = (roomId, nickname, setAudio) => {
   const { viewer, setHistory, setPlayers, setCurrentMove, setCurrentPlayer, isPlayer } = useGameStore();
 
-  // 使用 useRef 保持 socket 和 Setup 的持久性
   const socketRef = useRef(null);
   const gameStarted = useRef(false);
   const token = useRef('');
 
   function onUpdate(res){
-    // 注意这里使用函数形式来更新 history，以保证正确的顺序和更新
     gameStarted.current = true;
     setAudio(new Audio(getSoundURL(res[3])));
     setHistory((prevHistory) => {
       const nextBoard = convertToBoard(res[0], viewer.current.facing);
       if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
         return [...prevHistory];
+      }
+      if((res[2] - viewer.current.facing + 4) % 4 === viewer.current.facing){
+        new Audio(getSoundURL('YourTurn'))?.play();
       }
       if(prevHistory.length === 1 && prevHistory[0][8][4].id === 'None'){
         return [nextBoard];
@@ -94,7 +95,6 @@ const useSocket = (roomId, nickname, setAudio) => {
     });
     setPlayers(convertToPlayers(res[1], viewer.current.facing));
     setCurrentPlayer({facing: (res[2] - viewer.current.facing + 4) % 4});
-    new Audio(getSoundURL('YourTurn'))?.play();
   }
 
   function onRoomUpdate(res){
@@ -104,14 +104,9 @@ const useSocket = (roomId, nickname, setAudio) => {
   function onFirstUpdate(res){
     viewer.current.facing = res[0];
     isPlayer.current = res[1];
-    console.log(isPlayer);
+    token.current = res[2];
   }
 
-  function onTokenUpdate(res){
-    token.current = res;
-  }
-
-  // 初始化 socket 和监听事件的 Setup 函数
   function initializeSocket() {
     socketRef.current = io(apiURL_prefix + roomId);
     setCurrentMove(0);
@@ -119,7 +114,6 @@ const useSocket = (roomId, nickname, setAudio) => {
     socketRef.current.on('update', onUpdate);
     socketRef.current.on('firstUpdate', onFirstUpdate);
     socketRef.current.on('roomUpdate', onRoomUpdate);
-    socketRef.current.on('tokenUpdate', onTokenUpdate);
     socketRef.current.emit('join', [nickname]);
   }
 
@@ -138,8 +132,12 @@ const useSocket = (roomId, nickname, setAudio) => {
     ]);
   }
 
+  function inactive(){
+    socketRef.current.emit('inactive');
+  }
+
   function reconnect(){
-    if(!gameStarted.current || !isPlayer.current){
+    if(!isPlayer.current){
       initializeSocket();
     }
     else{
@@ -147,7 +145,6 @@ const useSocket = (roomId, nickname, setAudio) => {
       socketRef.current.on('update', onUpdate);
       socketRef.current.on('firstUpdate', onFirstUpdate);
       socketRef.current.on('roomUpdate', onRoomUpdate);
-      socketRef.current.on('tokenUpdate', onTokenUpdate);
       socketRef.current.emit('rejoin', [nickname, token.current]);
     }
   }
@@ -156,14 +153,7 @@ const useSocket = (roomId, nickname, setAudio) => {
     socketRef.current.disconnect();
   }
 
-  return { socket: socketRef.current, setup: initializeSocket, move, drop, reconnect, disconnect };
+  return { gameStarted, socket: socketRef.current, setup: initializeSocket, move, drop, reconnect, disconnect, inactive };
 };
 
 export default useSocket;
-
-/*
-[
-  [Chess ... {type:Number, owner:Number}],
-  [Player ... { id:Number, piecesInHand:[count_type_0, count_type_1 ...] } ]
-]
-*/
