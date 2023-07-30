@@ -94,7 +94,7 @@ function isCheckmated(board, players, facing) {
         for (const [y, piece] of row.entries())
             if (
             piece.facing === facing &&
-            getValidPoints(board, players, facing, [x, y]).length
+            getValidPoints(board, players, facing, [x, y]).length > 0
             )
                 return false;
     return true;
@@ -106,7 +106,7 @@ function getValidPoints(board, players, facing, point) {
     let [kingX, kingY] = getPointKing(board, facing);
     const reachablePoints = getReachablePoints(board, [x, y]);
     const validPoints = reachablePoints.filter(([toX, toY]) => {
-        if (board[toX][toY].id === 'k') return false;
+        if (board[toX][toY].id === 'k' || board[toX][toY].id === 'dead') return false;
         const newBoard = board.map((row) => row.slice());
         if (piece.id === 'k') {
             kingX = toX;
@@ -144,7 +144,7 @@ function isDropPawnMate(board, players, facing, point) {
         const [x, y] = point;
         const newBoard = board.map((row) => row.slice());
         newBoard[x][y] = {id: 'p', facing: facing, promoted: false};
-        if (isCheckmated(newBoard, players,{ facing: piece.facing })) return true;
+        if (isCheckmated(newBoard, players, piece.facing)) return true;
     }
     return false;
 }
@@ -168,7 +168,7 @@ function getDroppablePoints(board, players, facing, dropPiece) {
             return (
                 rx > 0 &&
                 !columnsWithPawn.includes(ry) &&
-                !isDropPawnMate(board,players, facing, point)
+                !isDropPawnMate(board, players, facing, point)
             );
         });
     }
