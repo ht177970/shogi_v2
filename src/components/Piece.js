@@ -5,7 +5,8 @@ const size = {
   's': 0.9,
   'g': 0.9,
   'k': 1,
-  'r': 1
+  'r': 1,
+  'dead': 1
 }
 
 const imagePath = [
@@ -27,20 +28,21 @@ const GetMask = (piece) => {
 }
 
 function Piece({selected, piece, onClick}){
-  let mask = <img alt='' draggable={false} className='absolute w-full h-full' src={getAssetURL('body/' + imagePath[piece.facing])}/>
+  let mask =
+    <div className='max-w-[50%] h-[70%] z-10 m-auto aspect-[3/4]'
+    style={{
+      height: size[piece.id] * 70 + "%",
+      backgroundColor: piece.promoted ? '#ff0000' : '#000000',
+      mask: GetMask(piece), WebkitMask: GetMask(piece)
+    }}/>
   if(piece.id === 'dead'){
     mask = '';
   }
   return(
     <div className={'transition-all h-full' + (selected ? ' selected' : '')} onClick={() => {onClick();}}>
       <div className='aspect-square relative w-full h-full flex select-none' style={{transform: 'scale(' + size[piece.id] + ')'}}>
-        <div className='max-w-[50%] h-[70%] z-10 m-auto aspect-[3/4]'
-        style={{
-          height: size[piece.id] * 70 + "%",
-          backgroundColor: piece.promoted ? '#ff0000' : '#000000',
-          mask: GetMask(piece), WebkitMask: GetMask(piece)
-        }}/>
         {mask}
+        <img alt='' draggable={false} className='absolute w-full h-full' src={getAssetURL('body/' + imagePath[piece.facing])}/>
       </div>
     </div>
   )
