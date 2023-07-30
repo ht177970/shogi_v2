@@ -23,8 +23,8 @@ function convertToPlayers(playersData, rotation) {
 
   const players = []
   for (let i = 0; i < 4; ++i){
-    const { piecesInHand, checkmated, nickname } = playersData[(i+rotation)%4]
-    players.push({facing: i, piecesInHand: convertToholding(piecesInHand), checkmated: checkmated, nickname: nickname})
+    const { piecesInHand, checkmated, nickname, inactive } = playersData[(i+rotation)%4]
+    players.push({facing: i, piecesInHand: convertToholding(piecesInHand), checkmated: checkmated, nickname: nickname, inactive: inactive})
   }
   return players
 }
