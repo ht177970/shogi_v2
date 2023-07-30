@@ -85,7 +85,7 @@ const useSocket = (roomId, nickname, setAudio) => {
       if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
         return [...prevHistory];
       }
-      if((res[2] - viewer.current.facing + 4) % 4 === viewer.current.facing){
+      if(isPlayer.current && res[2] === viewer.current.facing){
         new Audio(getSoundURL('YourTurn'))?.play();
       }
       if(prevHistory.length === 1 && prevHistory[0][8][4].id === 'None'){
