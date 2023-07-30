@@ -94,7 +94,7 @@ const StoreProvider = ({ children }) => {
       .fill(0)
       .map((x) => Array(9).fill(false))
   );
-  const isPlayer = useRef(true);
+  const isPlayer = useRef(false);
   const selected = useRef(false);
 
   const [mode, setMode] = useState('normal');
