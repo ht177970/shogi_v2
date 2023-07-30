@@ -11,7 +11,6 @@ function Dashboard(){
         <label className="config-label">模式</label>
         <select className="config-select" value={mode} onChange={(e) => setMode(e.target.value)}>
           <option value="normal">一般</option>
-          <option value="debug">除錯</option>
         </select>
       </div>
       <div className="config-item">
