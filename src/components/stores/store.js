@@ -87,7 +87,7 @@ const StoreProvider = ({ children }) => {
   const [currentPlayer, setCurrentPlayer] = useState({ facing: 0 });
   const [history, setHistory] = useState([initBoard()]);
   const [currentMove, setCurrentMove] = useState(0);
-  const [players, setPlayers] = useState(Array(4).fill().map((v, i) => { return {facing: i, piecesInHand: {'p': 0, 's': 0, 'g': 0, 'r': 0}, checkmated: false, inactive: true}}));
+  const [players, setPlayers] = useState(Array(4).fill().map((v, i) => { return {facing: i, piecesInHand: {'p': 0, 's': 0, 'g': 0, 'r': 0}, checkmated: false, inactive: true, time: 120}}));
   const [selection, setSelection] = useState({ x: -1, y: -1, dropPiece: null });
   const [hint, setHint] = useState(
     Array(9)
