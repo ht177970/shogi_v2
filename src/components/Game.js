@@ -79,15 +79,6 @@ function Game({roomId, nickname, setUrl}){
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history]);
 
-  const moves = history.map((board, move) => {
-    return(
-      <li className='movement' onClick={() => {jumpTo(move);}}
-      style={{backgroundColor: move === currentMove && 'aqua'}} key={move}>
-        {"第" + move + "手"}
-      </li>
-    )
-  });
-
   const infos = [];
   for(let i = 0;i < 4;i++){
     infos.push(
@@ -102,7 +93,16 @@ function Game({roomId, nickname, setUrl}){
       </div>
       <div className='piece-moves' ref={scroller}>
         <ul className='move-list'>
-          {moves}
+          {
+            history.map((board, move) => {
+              return(
+                <li className='movement' onClick={() => {jumpTo(move);}}
+                style={{backgroundColor: move === currentMove && 'aqua'}} key={move}>
+                  {"第" + move + "手"}
+                </li>
+              )
+            })
+          }
         </ul>
       </div>
       <div>
