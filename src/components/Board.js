@@ -35,42 +35,16 @@ function Board({currentBoard, movable, move, drop}){
   const { selection, select, deselect, isSelected, currentPlayer, hint, isPlayer } = useGameStore();
 
   function handleClick(pos){
-    if(!movable || !isPlayer.current){
-      return;
-    }
     if (!isSelected() && canSelect(currentBoard[pos.x][pos.y], currentPlayer))
-        select(pos.x, pos.y, null)
+      select(pos.x, pos.y, null)
     else
-        deselect()
-    /*if(promotionDialog.id !== 'None'){
-      setPromotionDialog({x: -1, y: -1, facing: -1, id: 'None'});
-      deselect();
-      return;
-    }
-    setPromotionDialog({x: -1, y: -1, facing: -1, id: 'None'});
-    if(isSelected()){
-      if(selection.dropPiece){
-        drop([pos.x, pos.y], selection.dropPiece.id);
-      }
-      else{
-        if(canPromote([pos.x, pos.y], currentBoard, selection)){
-          setPromotionDialog({x: pos.x, y: pos.y, facing: currentBoard[selection.x][selection.y].facing, id: currentBoard[selection.x][selection.y].id})
-          return;
-        }
-        else{
-          move([selection.x, selection.y], [pos.x, pos.y], false);
-        }
-      }
-      deselect();
-    }
-    else{
-      if(canSelect(currentBoard[pos.x][pos.y], currentPlayer)){
-        select(pos.x, pos.y, null);
-      }
-    }*/
+      deselect()
   }
 
   function handleHintClick(x, y){
+    if(!movable || !isPlayer.current){
+      return;
+    }
     setPromotionDialog({x: -1, y: -1, facing: -1, id: 'None'});
     if (selection.dropPiece)
         drop([x, y], selection.dropPiece.id);
