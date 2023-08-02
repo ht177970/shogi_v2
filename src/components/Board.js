@@ -15,7 +15,7 @@ function PromoteDialog({ facing, pos, promotionDialog, setPromotionDialog, move 
   }
 
   return(
-    <div className='bg-white absolute w-full h-[200%] top-0 origin-[50%_25%] flex flex-col rounded-[1vmin] z-30 promotionDialog' style={{transform: 'rotate(' + facing * 90 + 'deg)'}}>
+    <div className='bg-white absolute w-full h-[200%] top-0 origin-[50%_25%] flex flex-col rounded-[1vmin] z-30 promotionDialog' style={{transform: `rotate(${facing * 90}deg)`}}>
       <Piece selected={false} piece={{id: promotionDialog.id, facing: facing, promoted: true}} onClick={() => {confirm(true);}}/>
       <Piece selected={false} piece={{id: promotionDialog.id, facing: facing, promoted: false}} onClick={() => {confirm(false);}}/>
     </div>

@@ -18,7 +18,7 @@ function PieceStand({facing}){
   for(const key in players[facing].piecesInHand){
     const number = players[facing].piecesInHand[key];
     content.push(
-      <div key={key} className={'relative w-full h-full' + (number === 0 ? ' opacity-60' : '')} onClick={() => {handleClick(key, number);}}>
+      <div key={key} className={`relative w-full h-full ${number === 0 ? 'opacity-60' : ''}`} onClick={() => {handleClick(key, number);}}>
         <div className='absolute text-[3vmin] shadow-white top-0 right-[10%] z-20'
         style={{textShadow:'-1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff'}}>
           { number }
