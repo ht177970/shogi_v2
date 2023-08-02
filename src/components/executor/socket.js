@@ -1,4 +1,4 @@
-import { io } from 'socket.io-client';
+import { connect, io } from 'socket.io-client';
 import { rotate } from '../entity/utils';
 import { initBoard, useGameStore } from '../stores/store';
 import { useRef } from 'react';
@@ -23,8 +23,8 @@ function convertToPlayers(playersData, rotation) {
 
   const players = []
   for (let i = 0; i < 4; ++i){
-    const { piecesInHand, checkmated, nickname, inactive } = playersData[(i+rotation)%4]
-    players.push({facing: i, piecesInHand: convertToholding(piecesInHand), checkmated: checkmated, nickname: nickname, inactive: inactive})
+    const { piecesInHand, checkmated, nickname, inactive, time } = playersData[(i+rotation)%4]
+    players.push({facing: i, piecesInHand: convertToholding(piecesInHand), checkmated: checkmated, nickname: nickname, inactive: inactive, time: time})
   }
   return players
 }
@@ -77,24 +77,24 @@ const useSocket = (roomId, nickname, setAudio) => {
   const gameStarted = useRef(false);
   const token = useRef('');
 
-  function onUpdate(res){
+  function onBoardUpdate(res){
+    const YourTurnAudio = new Audio(getSoundURL('YourTurn'));
     gameStarted.current = true;
-    setAudio(new Audio(getSoundURL(res[3])));
+    setAudio(new Audio(getSoundURL(res[2])));
     setHistory((prevHistory) => {
       const nextBoard = convertToBoard(res[0], viewer.current.facing);
       if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
         return [...prevHistory];
       }
-      if(isPlayer.current && res[2] === viewer.current.facing){
-        new Audio(getSoundURL('YourTurn'))?.play();
+      if(isPlayer.current && res[1] === viewer.current.facing){
+        YourTurnAudio?.play();
       }
       if(prevHistory.length === 1 && prevHistory[0][8][4].id === 'None'){
         return [nextBoard];
       }
       return [...prevHistory, nextBoard];
     });
-    setPlayers(convertToPlayers(res[1], viewer.current.facing));
-    setCurrentPlayer({facing: (res[2] - viewer.current.facing + 4) % 4});
+    setCurrentPlayer({facing: (res[1] - viewer.current.facing + 4) % 4});
   }
 
   function onRoomUpdate(res){
@@ -107,13 +107,17 @@ const useSocket = (roomId, nickname, setAudio) => {
     token.current = res[2];
   }
 
-  function initializeSocket() {
+  function connect(){
     socketRef.current = io(apiURL_prefix + roomId);
-    setCurrentMove(0);
-    setHistory([initBoard()]);
-    socketRef.current.on('update', onUpdate);
+    socketRef.current.on('boardUpdate', onBoardUpdate);
     socketRef.current.on('firstUpdate', onFirstUpdate);
     socketRef.current.on('roomUpdate', onRoomUpdate);
+  }
+
+  function initializeSocket() {
+    setCurrentMove(0);
+    setHistory([initBoard()]);
+    connect();
     socketRef.current.emit('join', [nickname]);
   }
 
@@ -137,14 +141,11 @@ const useSocket = (roomId, nickname, setAudio) => {
   }
 
   function reconnect(){
+    connect();
     if(!isPlayer.current){
-      initializeSocket();
+      socketRef.current.emit('join', [nickname]);
     }
     else{
-      socketRef.current = io(apiURL_prefix + roomId);
-      socketRef.current.on('update', onUpdate);
-      socketRef.current.on('firstUpdate', onFirstUpdate);
-      socketRef.current.on('roomUpdate', onRoomUpdate);
       socketRef.current.emit('rejoin', [nickname, token.current]);
     }
   }
