@@ -75,9 +75,10 @@ const useSocket = (roomId, nickname, setAudio) => {
 
   const socketRef = useRef(null);
   const gameStarted = useRef(false);
+  const isMyTurn = useRef(false);
   const token = useRef('');
-  const YourTurnAudio = new Audio(getSoundURL('YourTurn'));
-  const TimeAudio = new Audio(getSoundURL('time3'));
+  const yourTurnAudio = new Audio(getSoundURL('YourTurn'));
+  const timeAudio = new Audio(getSoundURL('time3'));
   const sounds = {'move': new Audio(getSoundURL('move')), 'drop': new Audio(getSoundURL('drop'))};
 
   function onBoardUpdate(res){
@@ -88,8 +89,10 @@ const useSocket = (roomId, nickname, setAudio) => {
       if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
         return [...prevHistory];
       }
+      isMyTurn.current = false;
       if(isPlayer.current && res[1] === viewer.current.facing){
-        YourTurnAudio?.play();
+        yourTurnAudio?.play();
+        isMyTurn.current = true;
       }
       if(prevHistory.length === 1 && prevHistory[0][8][4].id === 'None'){
         return [nextBoard];
@@ -102,8 +105,8 @@ const useSocket = (roomId, nickname, setAudio) => {
   function onRoomUpdate(res){
     setPlayers(convertToPlayers(res[0], viewer.current.facing));
     const { time } = res[0][viewer.current.facing]
-    if(time <= 3){
-      TimeAudio?.play();
+    if(time <= 3 && isMyTurn.current){
+      timeAudio?.play();
     }
   }
 
