@@ -76,9 +76,10 @@ const useSocket = (roomId, nickname, setAudio) => {
   const socketRef = useRef(null);
   const gameStarted = useRef(false);
   const token = useRef('');
+  const YourTurnAudio = new Audio(getSoundURL('YourTurn'));
+  const TimeAudio = new Audio(getSoundURL('time3'));
 
   function onBoardUpdate(res){
-    const YourTurnAudio = new Audio(getSoundURL('YourTurn'));
     gameStarted.current = true;
     setAudio(new Audio(getSoundURL(res[2])));
     setHistory((prevHistory) => {
@@ -101,7 +102,7 @@ const useSocket = (roomId, nickname, setAudio) => {
     setPlayers(convertToPlayers(res[0], viewer.current.facing));
     const { time } = res[0][viewer.current.facing]
     if(time <= 3){
-      //sounds
+      TimeAudio?.play();
     }
   }
 
