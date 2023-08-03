@@ -78,10 +78,11 @@ const useSocket = (roomId, nickname, setAudio) => {
   const token = useRef('');
   const YourTurnAudio = new Audio(getSoundURL('YourTurn'));
   const TimeAudio = new Audio(getSoundURL('time3'));
+  const sounds = {'move': new Audio(getSoundURL('move')), 'drop': new Audio(getSoundURL('drop'))};
 
   function onBoardUpdate(res){
     gameStarted.current = true;
-    setAudio(new Audio(getSoundURL(res[2])));
+    setAudio(sounds[res[2]]);
     setHistory((prevHistory) => {
       const nextBoard = convertToBoard(res[0], viewer.current.facing);
       if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
