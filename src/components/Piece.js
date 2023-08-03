@@ -30,7 +30,7 @@ const GetMask = (piece) => {
 function Piece({selected, piece, onClick}){
   return(
     <div className={`transition-all h-full ${selected ? 'selected' : ''}`} onClick={() => {onClick();}}>
-      <div className='aspect-square relative w-full h-full flex select-none' style={{transform: `scale(${size[piece.id]}deg)`}}>
+      <div className='aspect-square relative w-full h-full flex select-none' style={{transform: `scale(${size[piece.id]})`}}>
         {
           piece.id !== 'dead' &&
           <div className='max-w-[50%] h-[70%] z-10 m-auto aspect-[3/4]'

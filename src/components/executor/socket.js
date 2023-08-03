@@ -99,6 +99,10 @@ const useSocket = (roomId, nickname, setAudio) => {
 
   function onRoomUpdate(res){
     setPlayers(convertToPlayers(res[0], viewer.current.facing));
+    const { time } = res[0][viewer.current.facing]
+    if(time <= 3){
+      //sounds
+    }
   }
 
   function onFirstUpdate(res){

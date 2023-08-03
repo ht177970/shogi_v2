@@ -6,7 +6,7 @@ function InfoBar({facing}){
 
   function toTimeString(second){
     let ret = '';
-    const m = second / 60;
+    const m = ~~(second / 60);
     if(m < 10)
       ret += '0';
     ret += m + ':';
