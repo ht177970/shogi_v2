@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "四人將棋",
+  "name": "Four Player",
   "icons": [
     {
       "src": "favicon.ico",
