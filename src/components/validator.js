@@ -28,7 +28,7 @@ export function getValidities(board, players, currentPlayer, selection) {
 
 export function canSelect(piece, currentPlayer) {
     if (InDebugMode()) return true;
-    return piece.facing === currentPlayer.facing && piece.id !== 'None';
+    return piece.facing === currentPlayer.facing && piece.id !== 'None' && piece.id !== 'dead';
 }
 
 export function canPromote(point, board, selection) {
