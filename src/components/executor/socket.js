@@ -1,4 +1,4 @@
-import { connect, io } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { rotate } from '../entity/utils';
 import { initBoard, useGameStore } from '../stores/store';
 import { useRef } from 'react';
