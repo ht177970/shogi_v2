@@ -14,7 +14,7 @@ function Game({roomId, nickname, setUrl}){
   const { gameStarted, setup, move, drop, reconnect, disconnect, inactive, leaveRoom } = useSocket(roomId, nickname, setAudio);
   const scroller = useRef(null);
   const board = useRef(null);
-  let currentBoard = history[currentMove];
+  let currentBoard = history[currentMove >= history.length ? history.length - 1 : currentMove];
   if(!currentBoard){
     currentBoard = initBoard();
   }
@@ -47,28 +47,33 @@ function Game({roomId, nickname, setUrl}){
   useEffect(() => {
     setup();
     AppState.addEventListener("change", _handleAppStateChange);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() =>{
     function onWheel(event){
       event.preventDefault();
       if (event.wheelDelta > 0) {
-        if(currentMove - 1 >= 0){
-          deselect();
-          setCurrentMove(currentMove - 1);
-        }
+        setCurrentMove((prev) => {
+          if(prev - 1 >= 0)
+            return prev - 1;
+          return prev;
+        });
       } else {
-        deselect();
-        if(currentMove + 1 < history.length){
-          setCurrentMove(currentMove + 1);
-        }
-        else{
-          setCurrentMove(history.length - 1);
-        }
+        setCurrentMove((prev) => prev + 1);
       }
     }
-    board.current?.addEventListener('wheel', onWheel, {passive: false});
-  }, [currentMove, history, setCurrentMove, deselect]);
+    board.current.addEventListener('wheel', onWheel, {passive: false});
+  }, []);
+
+  useEffect(() => {
+    if(currentMove >= history.length){
+      setCurrentMove(history.length - 1);
+      return;
+    }
+    deselect();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMove]);
 
   useEffect(() => {
     if(currentMove === history.length - 2){
