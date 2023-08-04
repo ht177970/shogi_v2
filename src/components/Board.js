@@ -35,6 +35,10 @@ function Board({currentBoard, movable, move, drop}){
   const { selection, select, deselect, isSelected, currentPlayer, hint, isPlayer } = useGameStore();
 
   function handleClick(pos){
+    if(!movable || !isPlayer.current){
+      return;
+    }
+    setPromotionDialog({x: -1, y: -1, facing: -1, id: 'None'});
     if (!isSelected() && canSelect(currentBoard[pos.x][pos.y], currentPlayer))
       select(pos.x, pos.y, null)
     else
