@@ -37,6 +37,7 @@ function Game({roomId, nickname, setUrl}){
 
   function leave(){
     if(!gameStarted.current || !isPlayer.current){
+      console.log('test3');
       leaveRoom();
       setUrl(null);
     }

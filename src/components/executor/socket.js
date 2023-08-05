@@ -103,17 +103,12 @@ const useSocket = (roomId, nickname) => {
   function onBoardUpdate(res){
     gameStarted.current = true;
     //setAudio(sounds[res[2]]);
-    sounds[res[1]]?.play();
     setHistory((prevHistory) => {
       const nextBoard = convertToBoard(res[0], viewer.current.facing);
       if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
         return [...prevHistory];
       }
-      isMyTurn.current = false;
-      if(isPlayer.current && res[1] === viewer.current.facing){
-        yourTurnAudio?.play();
-        isMyTurn.current = true;
-      }
+      sounds[res[1]]?.play();
       if(prevHistory.length === 1 && prevHistory[0][8][4].id === 'None'){
         return [nextBoard];
       }
@@ -125,6 +120,11 @@ const useSocket = (roomId, nickname) => {
         return [nextPlayers];
       if(isSamePlayers(prevPlayers[prevPlayers.length - 1], nextPlayers)){
         return [...prevPlayers];
+      }
+      isMyTurn.current = false;
+      if(nextPlayers[0].turn){
+        yourTurnAudio?.play();
+        isMyTurn.current = true;
       }
       return [...prevPlayers, nextPlayers];
     });
@@ -140,7 +140,7 @@ const useSocket = (roomId, nickname) => {
 
   function onFirstUpdate(res){
     viewer.current.facing = res[0];
-    isPlayer.current = res[1];
+    isPlayer.current = res[1] === 1;
     token.current = res[2];
   }
 
