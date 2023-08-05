@@ -89,7 +89,7 @@ const getSoundURL = (path) => {
 }
 
 
-const useSocket = (roomId, nickname, setAudio) => {
+const useSocket = (roomId, nickname) => {
   const { viewer, setHistory, setHistoryPlayers, setSocketPlayers, setCurrentMove, isPlayer } = useGameStore();
 
   const socketRef = useRef(null);

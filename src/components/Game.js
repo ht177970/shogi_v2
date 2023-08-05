@@ -9,9 +9,8 @@ import InfoBar from './InfoBar';
 import Dashboard from './Dashboard';
 
 function Game({roomId, nickname, setUrl}){
-  const [audio, setAudio] = useState(null);
   const { history, currentMove, setCurrentMove, isPlayer, deselect } = useGameStore();
-  const { gameStarted, setup, move, drop, reconnect, disconnect, inactive, leaveRoom } = useSocket(roomId, nickname, setAudio);
+  const { gameStarted, setup, move, drop, reconnect, disconnect, inactive, leaveRoom } = useSocket(roomId, nickname);
   const scroller = useRef(null);
   const board = useRef(null);
   const currentBoard = history[currentMove >= history.length ? history.length - 1 : currentMove];
