@@ -4,7 +4,7 @@ import { getValidPoints, getDroppablePoints, isThreatened, getPointKing } from '
 
 const InDebugMode = () => false;
 
-export function getValidities(board, players, currentPlayer, selection) {
+export function getValidities(board, players, selection) {
     const validityDefault = InDebugMode();
     const validities = Array(9)
         .fill(0)
@@ -15,20 +15,20 @@ export function getValidities(board, players, currentPlayer, selection) {
             ? getDroppablePoints(
                 board,
                 players,
-                currentPlayer.facing,
+                0,
                 selection.dropPiece
             )
             : getValidPoints(
                 board,
-                players, currentPlayer.facing,
+                players, 0,
                 [ selection.x, selection.y ]))
             validities[x][y] = true;
     return validities;
 }
 
-export function canSelect(piece, currentPlayer) {
+export function canSelect(piece) {
     if (InDebugMode()) return true;
-    return piece.facing === currentPlayer.facing && piece.id !== 'None' && piece.id !== 'dead';
+    return piece.facing === 0 && piece.id !== 'None' && piece.id !== 'dead';
 }
 
 export function canPromote(point, board, selection) {

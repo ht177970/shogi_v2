@@ -23,8 +23,17 @@ function convertToPlayers(playersData, rotation) {
 
   const players = []
   for (let i = 0; i < 4; ++i){
-    const { piecesInHand, checkmated, nickname, inactive, time } = playersData[(i+rotation)%4]
-    players.push({facing: i, piecesInHand: convertToholding(piecesInHand), checkmated: checkmated, nickname: nickname, inactive: inactive, time: time})
+    const { piecesInHand, checkmated, turn } = playersData[(i+rotation)%4]
+    players.push({facing: i, piecesInHand: convertToholding(piecesInHand), checkmated: checkmated, turn: turn})
+  }
+  return players
+}
+
+function convertToSocketPlayers(playersData, rotation) {
+  const players = []
+  for (let i = 0; i < 4; ++i){
+    const { nickname, inactive, time } = playersData[(i+rotation)%4]
+    players.push({facing: i, nickname: nickname, inactive: inactive, time: time})
   }
   return players
 }
@@ -65,13 +74,23 @@ function isSameBoard(prevBoard, nextBoard){
   return true;
 }
 
+function isSamePlayers(prevPlayers, nextPlayers){
+  const length = 4;
+  for(let i = 0;i < length;i++){
+    if(prevPlayers[i] && nextPlayers[i] && prevPlayers[i].turn !== nextPlayers[i].turn){
+      return false;
+    }
+  }
+  return true;
+}
+
 const getSoundURL = (path) => {
   return new URL(`https://ht177970.github.io/shogi_v2/assets/sound/${path}Sound.mp3`, import.meta.url).href
 }
 
 
 const useSocket = (roomId, nickname, setAudio) => {
-  const { viewer, setHistory, setPlayers, setCurrentMove, setCurrentPlayer, isPlayer } = useGameStore();
+  const { viewer, setHistory, setHistoryPlayers, setSocketPlayers, setCurrentMove, isPlayer } = useGameStore();
 
   const socketRef = useRef(null);
   const gameStarted = useRef(false);
@@ -83,7 +102,8 @@ const useSocket = (roomId, nickname, setAudio) => {
 
   function onBoardUpdate(res){
     gameStarted.current = true;
-    setAudio(sounds[res[2]]);
+    //setAudio(sounds[res[2]]);
+    sounds[res[1]]?.play();
     setHistory((prevHistory) => {
       const nextBoard = convertToBoard(res[0], viewer.current.facing);
       if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
@@ -99,11 +119,19 @@ const useSocket = (roomId, nickname, setAudio) => {
       }
       return [...prevHistory, nextBoard];
     });
-    setCurrentPlayer({facing: (res[1] - viewer.current.facing + 4) % 4});
+    setHistoryPlayers((prevPlayers) => {
+      const nextPlayers = convertToPlayers(res[2], viewer.current.facing);
+      if('first' in prevPlayers[0][0])
+        return [nextPlayers];
+      if(isSamePlayers(prevPlayers[prevPlayers.length - 1], nextPlayers)){
+        return [...prevPlayers];
+      }
+      return [...prevPlayers, nextPlayers];
+    });
   }
 
   function onRoomUpdate(res){
-    setPlayers(convertToPlayers(res[0], viewer.current.facing));
+    setSocketPlayers(convertToSocketPlayers(res[0], viewer.current.facing));
     const { time } = res[0][viewer.current.facing]
     if(time <= 3 && isMyTurn.current){
       timeAudio?.play();
@@ -127,7 +155,7 @@ const useSocket = (roomId, nickname, setAudio) => {
     setCurrentMove(0);
     setHistory([initBoard()]);
     connect();
-    socketRef.current.emit('join', [nickname]);
+    socketRef.current.emit('join', [nickname, 0]);
   }
 
   function move(origin, destination, promotion) {
@@ -149,13 +177,13 @@ const useSocket = (roomId, nickname, setAudio) => {
     socketRef.current.emit('inactive');
   }
 
-  function reconnect(){
+  function reconnect(received){
     connect();
     if(!isPlayer.current){
-      socketRef.current.emit('join', [nickname]);
+      socketRef.current.emit('join', [nickname, received]);
     }
     else{
-      socketRef.current.emit('rejoin', [nickname, token.current]);
+      socketRef.current.emit('rejoin', [nickname, token.current, received]);
     }
   }
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import Board from './Board';
-import { initBoard, useGameStore } from './stores/store';
+import { useGameStore } from './stores/store';
 import useSocket from './executor/socket';
 import './Game.css'
 import '../index.css';
@@ -14,18 +14,17 @@ function Game({roomId, nickname, setUrl}){
   const { gameStarted, setup, move, drop, reconnect, disconnect, inactive, leaveRoom } = useSocket(roomId, nickname, setAudio);
   const scroller = useRef(null);
   const board = useRef(null);
-  let currentBoard = history[currentMove >= history.length ? history.length - 1 : currentMove];
-  if(!currentBoard){
-    currentBoard = initBoard();
-  }
+  const currentBoard = history[currentMove >= history.length ? history.length - 1 : currentMove];
+
   const movable = (currentMove === history.length - 1);
 
   const appState = useRef(AppState.currentState);
+  const received = useRef(1);
 
   const _handleAppStateChange = (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === "active") {
         disconnect();
-        reconnect();
+        reconnect(received.current);
       }else{
         inactive();
       }
@@ -45,12 +44,6 @@ function Game({roomId, nickname, setUrl}){
   }
 
   useEffect(() => {
-    setup();
-    AppState.addEventListener("change", _handleAppStateChange);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() =>{
     function onWheel(event){
       event.preventDefault();
       if (event.wheelDelta > 0) {
@@ -63,7 +56,10 @@ function Game({roomId, nickname, setUrl}){
         setCurrentMove((prev) => prev + 1);
       }
     }
+    setup();
+    AppState.addEventListener("change", _handleAppStateChange);
     board.current.addEventListener('wheel', onWheel, {passive: false});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -80,7 +76,7 @@ function Game({roomId, nickname, setUrl}){
       setCurrentMove(currentMove + 1);
       scroller.current.scrollTop = scroller.current.scrollHeight;
     }
-    audio?.play();
+    received.current = history.length;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history]);
 

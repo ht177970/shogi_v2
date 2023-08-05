@@ -12,6 +12,25 @@ export function initBoard(){
   return board
 }
 
+export function initPlayers(){
+  return Array(4).fill().map((v, i) => {
+    return {facing: i,
+            piecesInHand: {'p': 0, 's': 0, 'g': 0, 'r': 0},
+            checkmated: false,
+            turn: false,
+            first: true}
+    });
+}
+
+function initSocketPlayers(){
+  return Array(4).fill().map((v, i) => {
+    return {facing: i,
+            nickname: '',
+            inactive: true,
+            time: 120}
+    });
+}
+
 const GameStoreContext = createContext(null);
 const ConfigStoreContext = createContext(null);
 
@@ -27,13 +46,16 @@ export const useConfigStore = () => {
   }
 }
 
+function min(a, b){
+  return a < b ? a : b;
+}
+
 export const useGameStore = () => {
 
   const gameStore = useContext(GameStoreContext);
 
   function reset() {
     gameStore.viewer.id = 0;
-    gameStore.currentPlayer.facing = 0;
     gameStore.setCurrentMove(0)
     gameStore.setHistory([initBoard()])
     deselect();
@@ -43,9 +65,8 @@ export const useGameStore = () => {
     gameStore.setSelection({x: x, y: y, dropPiece: dropPiece});
     gameStore.selected.current = true;
     gameStore.setHint(getValidities(
-      gameStore.history[gameStore.currentMove],
-      gameStore.players,
-      gameStore.currentPlayer,
+      gameStore.history[min(gameStore.currentMove, gameStore.history.length - 1)],
+      gameStore.historyPlayers[min(gameStore.currentMove, gameStore.historyPlayers.length - 1)],
       {x: x, y: y, dropPiece: dropPiece}));
   }
 
@@ -62,18 +83,19 @@ export const useGameStore = () => {
   return {
     reset,
     viewer: gameStore.viewer,
-    currentPlayer: gameStore.currentPlayer,
     history: gameStore.history,
+    historyPlayers: gameStore.historyPlayers,
     currentMove: gameStore.currentMove,
-    players: gameStore.players,
+    socketPlayers: gameStore.socketPlayers,
     selection: gameStore.selection,
     hint: gameStore.hint,
     isSelected: isSelected,
     select: select,
     deselect: deselect,
     setHistory: gameStore.setHistory,
+    setHistoryPlayers: gameStore.setHistoryPlayers,
     setCurrentMove: gameStore.setCurrentMove,
-    setPlayers: gameStore.setPlayers,
+    setSocketPlayers: gameStore.setSocketPlayers,
     setCurrentPlayer: gameStore.setCurrentPlayer,
     setSelection: gameStore.setSelection,
     setHint: gameStore.setHint,
@@ -84,10 +106,10 @@ export const useGameStore = () => {
 const StoreProvider = ({ children }) => {
 
   const viewer = useRef({ facing: 0 });
-  const [currentPlayer, setCurrentPlayer] = useState({ facing: 0 });
   const [history, setHistory] = useState([initBoard()]);
+  const [historyPlayers, setHistoryPlayers] = useState([initPlayers()]);
   const [currentMove, setCurrentMove] = useState(0);
-  const [players, setPlayers] = useState(Array(4).fill().map((v, i) => { return {facing: i, piecesInHand: {'p': 0, 's': 0, 'g': 0, 'r': 0}, checkmated: false, inactive: true, time: 120}}));
+  const [socketPlayers, setSocketPlayers] = useState(initSocketPlayers());
   const [selection, setSelection] = useState({ x: -1, y: -1, dropPiece: null });
   const [hint, setHint] = useState(
     Array(9)
@@ -105,14 +127,14 @@ const StoreProvider = ({ children }) => {
     <GameStoreContext.Provider
       value={{
         viewer,
-        currentPlayer,
-        setCurrentPlayer,
         history,
         setHistory,
+        historyPlayers,
+        setHistoryPlayers,
         currentMove,
         setCurrentMove,
-        players,
-        setPlayers,
+        socketPlayers,
+        setSocketPlayers,
         selection,
         setSelection,
         hint,
