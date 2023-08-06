@@ -37,7 +37,6 @@ function Game({roomId, nickname, setUrl}){
 
   function leave(){
     if(!gameStarted.current || !isPlayer.current){
-      console.log('test3');
       leaveRoom();
       setUrl(null);
     }
@@ -56,7 +55,13 @@ function Game({roomId, nickname, setUrl}){
         setCurrentMove((prev) => prev + 1);
       }
     }
+
+    function handleUnload(){
+      leaveRoom();
+    }
+
     setup();
+    window.addEventListener("beforeunload", handleUnload);
     AppState.addEventListener("change", _handleAppStateChange);
     board.current.addEventListener('wheel', onWheel, {passive: false});
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,7 +72,9 @@ function Game({roomId, nickname, setUrl}){
       setCurrentMove(history.length - 1);
       return;
     }
-    deselect();
+    if(currentMove !== history.length - 1){
+      deselect();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMove]);
 
