@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import Board from './Board';
 import { useGameStore } from './stores/store';
@@ -8,9 +8,10 @@ import '../index.css';
 import InfoBar from './InfoBar';
 import Dashboard from './Dashboard';
 
-function Game({roomId, nickname, setUrl}){
-  const { history, currentMove, setCurrentMove, isPlayer, deselect } = useGameStore();
-  const { gameStarted, setup, move, drop, reconnect, disconnect, inactive, leaveRoom } = useSocket(roomId, nickname);
+function Game({roomId, nickname, setUrl, rejoin}){
+  const muted = useRef(true);
+  const { history, currentMove, setCurrentMove, isPlayer, historyPlayers, deselect } = useGameStore();
+  const { gameStarted, token, setup, move, drop, reconnect, disconnect, inactive, leaveRoom } = useSocket(roomId, nickname, muted);
   const scroller = useRef(null);
   const board = useRef(null);
   const currentBoard = history[currentMove >= history.length ? history.length - 1 : currentMove];
@@ -20,7 +21,7 @@ function Game({roomId, nickname, setUrl}){
   const appState = useRef(AppState.currentState);
   const received = useRef(1);
 
-  const _handleAppStateChange = (nextAppState) => {
+  function handleAppStateChange(nextAppState){
       if (appState.current.match(/inactive|background/) && nextAppState === "active") {
         disconnect();
         reconnect(received.current);
@@ -36,7 +37,21 @@ function Game({roomId, nickname, setUrl}){
   }
 
   function leave(){
-    if(!gameStarted.current || !isPlayer.current){
+
+    function isGameEnded(){
+      const players = historyPlayers.slice(-1)[0];
+      let cu = 0;
+      for(const i in players){
+        if(players[i].checkmated){
+          cu++;
+        }
+      }
+      return cu === 3;
+    }
+
+    if(!gameStarted.current || !isPlayer.current || isGameEnded()){
+      localStorage.setItem('roomId', null);
+      localStorage.setItem('token', null);
       leaveRoom();
       setUrl(null);
     }
@@ -59,10 +74,22 @@ function Game({roomId, nickname, setUrl}){
     function handleUnload(){
       leaveRoom();
     }
-
-    setup();
+    if(rejoin){
+      muted.current = true;
+      token.current = localStorage.getItem('token');
+      reconnect(0);
+      setTimeout(() => {
+        muted.current = false;
+        setCurrentMove(1000);
+        scroller.current.scrollTop = scroller.current.scrollHeight;
+      }, 100);
+    }
+    else{
+      muted.current = false;
+      setup();
+    }
     window.addEventListener("beforeunload", handleUnload);
-    AppState.addEventListener("change", _handleAppStateChange);
+    AppState.addEventListener("change", handleAppStateChange);
     board.current.addEventListener('wheel', onWheel, {passive: false});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -72,7 +99,7 @@ function Game({roomId, nickname, setUrl}){
       setCurrentMove(history.length - 1);
       return;
     }
-    if(currentMove !== history.length - 1){
+    if(currentMove < history.length - 1){
       deselect();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

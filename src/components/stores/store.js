@@ -46,10 +46,6 @@ export const useConfigStore = () => {
   }
 }
 
-function min(a, b){
-  return a < b ? a : b;
-}
-
 export const useGameStore = () => {
 
   const gameStore = useContext(GameStoreContext);
@@ -65,8 +61,8 @@ export const useGameStore = () => {
     gameStore.setSelection({x: x, y: y, dropPiece: dropPiece});
     gameStore.selected.current = true;
     gameStore.setHint(getValidities(
-      gameStore.history[min(gameStore.currentMove, gameStore.history.length - 1)],
-      gameStore.historyPlayers[min(gameStore.currentMove, gameStore.historyPlayers.length - 1)],
+      gameStore.history.slice(-1)[0],
+      gameStore.historyPlayers.slice(-1)[0],
       {x: x, y: y, dropPiece: dropPiece}));
   }
 
@@ -116,7 +112,7 @@ const StoreProvider = ({ children }) => {
       .fill(0)
       .map((x) => Array(9).fill(false))
   );
-  const isPlayer = useRef(false);
+  const isPlayer = useRef(true);
   const selected = useRef(false);
 
   const [mode, setMode] = useState('normal');

@@ -84,7 +84,7 @@ function getPointKing(board, facing) {
     let pointKing = [];
     for (const [x, row] of board.entries())
         for (const [y, piece] of row.entries())
-            if (piece.id === 'k' && piece.facing === facing)
+            if ((piece.id === 'k' || piece.id === 'dead') && piece.facing === facing)
                 pointKing = [x, y];
     return pointKing;
 }
