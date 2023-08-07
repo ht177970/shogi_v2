@@ -89,7 +89,7 @@ const getSoundURL = (path) => {
 }
 
 
-const useSocket = (roomId, nickname) => {
+const useSocket = (roomId, nickname, muted) => {
   const { viewer, setHistory, setHistoryPlayers, setSocketPlayers, setCurrentMove, isPlayer } = useGameStore();
 
   const socketRef = useRef(null);
@@ -105,10 +105,11 @@ const useSocket = (roomId, nickname) => {
     //setAudio(sounds[res[2]]);
     setHistory((prevHistory) => {
       const nextBoard = convertToBoard(res[0], viewer.current.facing);
-      if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
+      /*if(isSameBoard(prevHistory[prevHistory.length - 1], nextBoard)){
         return [...prevHistory];
-      }
-      sounds[res[1]]?.play();
+      }*/
+      if(!muted.current)
+        sounds[res[1]]?.play();
       if(prevHistory.length === 1 && prevHistory[0][8][4].id === 'None'){
         return [nextBoard];
       }
@@ -116,16 +117,17 @@ const useSocket = (roomId, nickname) => {
     });
     setHistoryPlayers((prevPlayers) => {
       const nextPlayers = convertToPlayers(res[2], viewer.current.facing);
-      if('first' in prevPlayers[0][0])
-        return [nextPlayers];
-      if(isSamePlayers(prevPlayers[prevPlayers.length - 1], nextPlayers)){
-        return [...prevPlayers];
-      }
       isMyTurn.current = false;
       if(nextPlayers[0].turn){
-        yourTurnAudio?.play();
+        if(!muted.current)
+          yourTurnAudio?.play();
         isMyTurn.current = true;
       }
+      if('first' in prevPlayers[0][0])
+        return [nextPlayers];
+      /*if(isSamePlayers(prevPlayers[prevPlayers.length - 1], nextPlayers)){
+        return [...prevPlayers];
+      }*/
       return [...prevPlayers, nextPlayers];
     });
   }
@@ -134,7 +136,8 @@ const useSocket = (roomId, nickname) => {
     setSocketPlayers(convertToSocketPlayers(res[0], viewer.current.facing));
     const { time } = res[0][viewer.current.facing]
     if(time <= 3 && isMyTurn.current){
-      timeAudio?.play();
+      if(!muted.current)
+        timeAudio?.play();
     }
   }
 
@@ -142,6 +145,7 @@ const useSocket = (roomId, nickname) => {
     viewer.current.facing = res[0];
     isPlayer.current = res[1] === 1;
     token.current = res[2];
+    localStorage.setItem('token', res[2]);
   }
 
   function connect(){
@@ -196,7 +200,7 @@ const useSocket = (roomId, nickname) => {
     disconnect();
   }
 
-  return { gameStarted, socket: socketRef.current, setup: initializeSocket, move, drop, reconnect, disconnect, inactive, leaveRoom };
+  return { gameStarted, token, socket: socketRef.current, setup: initializeSocket, move, drop, reconnect, disconnect, inactive, leaveRoom };
 };
 
 export default useSocket;

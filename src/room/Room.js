@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 
 const apiURL = 'https://ryanmsg.myftp.biz:8080/game';
 
-function RoomList({setUrl, username, setUsername}){
+function RoomList({setUrl, username, setUsername, setRejoin}){
   const [socket, setSocket] = useState(null);
   const [roomName, setRoomName] = useState('');
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -13,15 +13,27 @@ function RoomList({setUrl, username, setUsername}){
     function updateRoomList(res){
       setRooms(res);
     }
+
     function updateURL(res){
+      localStorage.setItem('roomId', res[0]);
       setUrl(res[0]);
+      setRejoin(res[1]);
     }
 
     const sc = io(apiURL);
     setSocket(sc);
     sc.on('roomListUpdate', updateRoomList);
     sc.on('roomUrl', updateURL);
+    const roomId = localStorage.getItem('roomId');
+    if(roomId){
+      sc.emit('check', roomId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('nickname', username);
+  }, [username]);
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
