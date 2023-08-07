@@ -187,6 +187,7 @@ const useSocket = (roomId, nickname, muted) => {
       socketRef.current.emit('join', [nickname, received]);
     }
     else{
+      console.log(nickname);
       socketRef.current.emit('rejoin', [nickname, token.current, received]);
     }
   }

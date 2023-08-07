@@ -70,10 +70,6 @@ function Game({roomId, nickname, setUrl, rejoin}){
         setCurrentMove((prev) => prev + 1);
       }
     }
-
-    function handleUnload(){
-      leaveRoom();
-    }
     if(rejoin){
       muted.current = true;
       token.current = localStorage.getItem('token');
@@ -88,7 +84,6 @@ function Game({roomId, nickname, setUrl, rejoin}){
       muted.current = false;
       setup();
     }
-    window.addEventListener("beforeunload", handleUnload);
     AppState.addEventListener("change", handleAppStateChange);
     board.current.addEventListener('wheel', onWheel, {passive: false});
   // eslint-disable-next-line react-hooks/exhaustive-deps
